@@ -1,0 +1,13 @@
+{
+  "name": "ai-frontend-digest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Weekly AI x Frontend news digest emailed via Vercel Cron + Claude + Resend",
+  "scripts": {
+    "feeds": "node scripts/check-feeds.js",
+    "preview": "node --env-file=.env scripts/run-local.js preview",
+    "send": "node --env-file=.env scripts/run-local.js"
+  },
+  "engines": { "node": ">=20" }
+}
