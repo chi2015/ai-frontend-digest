@@ -5,7 +5,7 @@ Every Thursday it collects the week's AI-for-frontend news from about 27 feeds (
 No framework and no npm dependencies: one function file, `api/digest.js`.
 
 ```
-Vercel Cron (Mon 04:00 UTC = 09:00 Almaty)
+Vercel Schedule (Thu 04:00 UTC = 09:00 Almaty)
    → /api/digest
       → fetch all RSS/Atom feeds in parallel, keep the last 7 days
       → keyword filter (AI ∩ frontend) + dedupe
@@ -40,18 +40,18 @@ vercel.com → **Add New → Project** → pick the repo → Framework Preset: *
 | `RESEND_API_KEY` | `re_…` |
 | `EMAIL_TO` | your email |
 
-Click **Deploy**. Vercel reads `vercel.json` and registers the weekly cron job automatically. You'll see it under **Project → Settings → Cron Jobs**.
+Click **Deploy**. Vercel reads `vercel.json` and creates the `weekly-digest` schedule automatically when the deployment becomes production. You'll see it under **Schedules** in the project dashboard.
 
 ### 4. Test it right away (don't wait for Thursday)
 - **Preview in the browser, no email sent:**
   `https://YOUR-PROJECT.vercel.app/api/digest?secret=YOUR_CRON_SECRET&preview=1`
-- **Send now:** open the same URL without `&preview=1`, or click **Run** next to the job in Settings → Cron Jobs.
+- **Send now:** open the same URL without `&preview=1`, click **Run Schedule** on `weekly-digest` in the dashboard, or run `vercel schedules invoke weekly-digest`.
 - Logs: Project → **Logs** (filter by `/api/digest`).
 
 A run takes about 30–120 seconds because of the web searches, so the first load is slow.
 
 ## Customising
-- **Schedule:** change `"schedule"` in `vercel.json`. It uses UTC; `0 4 * * 4` is Thursday 09:00 at UTC+5. On the Hobby plan, cron can run at most once a day and fires at some point within the scheduled hour.
+- **Schedule:** change `"schedule"` in `vercel.json`. It uses UTC; `0 4 * * 4` is Thursday 09:00 at UTC+5. You can add `"timezone": "Asia/Almaty"` to the schedule to write the time in local time instead, but then change the expression to `0 9 * * 4`. On the Hobby plan, a schedule fires within a 15-minute window after the scheduled time.
 - **Sources:** edit the `SOURCES` array. `need: 'ai'` keeps only AI-related posts from a general frontend feed, `need: 'fe'` keeps only web-related posts from a general AI feed, and `need: null` keeps everything. Broken feeds are skipped automatically.
 - **Topic/tone:** edit the prompt in `buildPrompt()`.
 - **Env options:** `ANTHROPIC_MODEL`, `ENABLE_WEB_SEARCH=false` (cheaper, feeds only), `DAYS_BACK`, `EMAIL_FROM`.

@@ -3,7 +3,7 @@
 // Pipeline:  RSS/Atom feeds  →  keyword filter + dedupe  →  Claude (curation + live web search)
 //            →  HTML email  →  Resend
 //
-// Triggered weekly by Vercel Cron (see vercel.json). Can also be opened manually:
+// Triggered weekly by a Vercel Schedule (see vercel.json; sends GET with `Authorization: Bearer $CRON_SECRET`). Can also be opened manually:
 //   /api/digest?secret=YOUR_CRON_SECRET&preview=1   → shows the email in the browser, sends nothing
 //   /api/digest?secret=YOUR_CRON_SECRET             → builds and sends the email now
 
