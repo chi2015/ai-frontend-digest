@@ -19,37 +19,44 @@ const MAX_CANDIDATES = 140;
 //    null  → feed is already on-topic, keep everything
 //    Feeds that fail or time out are skipped, so adding/removing is safe.
 // ---------------------------------------------------------------------------
+// Only frontend-focused sources: frontend feeds filtered down to their AI items,
+// plus feeds/releases that are about AI for frontend by definition.
+// General AI news feeds (OpenAI, Latent Space, etc.) are intentionally excluded.
 const SOURCES = [
-  // Frontend portals & newsletters
+  // Frontend portals & newsletters (AI items only)
   { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/', need: 'ai' },
   { name: 'CSS-Tricks', url: 'https://css-tricks.com/feed/', need: 'ai' },
+  { name: 'Frontend Masters Blog', url: 'https://frontendmasters.com/blog/feed/', need: 'ai' },
   { name: 'JavaScript Weekly', url: 'https://javascriptweekly.com/rss', need: 'ai' },
   { name: 'Frontend Focus', url: 'https://frontendfoc.us/rss', need: 'ai' },
+  { name: 'The New Stack — Frontend', url: 'https://thenewstack.io/frontend-development/feed/', need: 'ai' },
   { name: 'web.dev', url: 'https://web.dev/feed.xml', need: 'ai' },
   { name: 'Chrome for Developers', url: 'https://developer.chrome.com/static/blog/feed.xml', need: 'ai' },
-  { name: 'Vercel Blog', url: 'https://vercel.com/atom', need: null },
-  { name: 'Netlify Blog', url: 'https://www.netlify.com/blog/index.xml', need: 'ai' },
+  { name: 'Vercel Blog', url: 'https://vercel.com/atom', need: 'ai' },
+  { name: 'Netlify Blog', url: 'https://www.netlify.com/feed.xml', need: 'ai' },
 
-  // Community
-  { name: 'dev.to #ai', url: 'https://dev.to/feed/tag/ai', need: 'fe' },
+  // AI-for-frontend blogs
+  { name: 'Builder.io Blog', url: 'https://www.builder.io/blog/feed.xml', need: 'ai' },
+  { name: 'Addy Osmani', url: 'https://addyo.substack.com/feed', need: 'ai' },
+
+  // Community (frontend channels, AI items only)
   { name: 'dev.to #frontend', url: 'https://dev.to/feed/tag/frontend', need: 'ai' },
+  { name: 'dev.to #webdev', url: 'https://dev.to/feed/tag/webdev', need: 'ai' },
   { name: 'dev.to #react', url: 'https://dev.to/feed/tag/react', need: 'ai' },
+  { name: 'dev.to #vibecoding', url: 'https://dev.to/feed/tag/vibecoding', need: 'fe' },
   { name: 'Hacker News (AI + frontend)', url: 'https://hnrss.org/newest?q=AI+frontend+OR+LLM+React+OR+AI+CSS+OR+AI+browser&points=20', need: null },
-  { name: 'Hacker News (agents/MCP)', url: 'https://hnrss.org/newest?q=MCP+OR+coding+agent+OR+Cursor+OR+Claude+Code&points=40', need: null },
+  { name: 'Hacker News (AI coding tools)', url: 'https://hnrss.org/newest?q=MCP+OR+coding+agent+OR+Cursor+OR+Claude+Code&points=40', need: 'fe' },
   { name: 'r/Frontend (top week)', url: 'https://www.reddit.com/r/Frontend/top/.rss?t=week', need: 'ai' },
   { name: 'r/webdev (top week)', url: 'https://www.reddit.com/r/webdev/top/.rss?t=week', need: 'ai' },
 
-  // AI engineering
-  { name: 'Simon Willison', url: 'https://simonwillison.net/atom/everything/', need: null },
-  { name: 'Latent Space', url: 'https://www.latent.space/feed', need: null },
-  { name: 'Hugging Face Blog', url: 'https://huggingface.co/blog/feed.xml', need: 'fe' },
-  { name: 'OpenAI News', url: 'https://openai.com/news/rss.xml', need: null },
-  { name: 'Google Developers Blog', url: 'https://developers.googleblog.com/feeds/posts/default', need: 'ai' },
-
-  // Releases of AI-for-frontend libraries
+  // Releases of AI-for-frontend libraries & tools
   { name: 'Vercel AI SDK releases', url: 'https://github.com/vercel/ai/releases.atom', need: null },
-  { name: 'MCP TypeScript SDK releases', url: 'https://github.com/modelcontextprotocol/typescript-sdk/releases.atom', need: null },
   { name: 'Transformers.js releases', url: 'https://github.com/huggingface/transformers.js/releases.atom', need: null },
+  { name: 'WebLLM releases', url: 'https://github.com/mlc-ai/web-llm/releases.atom', need: null },
+  { name: 'CopilotKit releases', url: 'https://github.com/CopilotKit/CopilotKit/releases.atom', need: null },
+  { name: 'assistant-ui releases', url: 'https://github.com/assistant-ui/assistant-ui/releases.atom', need: null },
+  { name: 'Chrome DevTools MCP releases', url: 'https://github.com/ChromeDevTools/chrome-devtools-mcp/releases.atom', need: null },
+  { name: 'Playwright MCP releases', url: 'https://github.com/microsoft/playwright-mcp/releases.atom', need: null },
 ];
 
 const AI_RE = /\b(ai|a\.i\.|llms?|gpt[-\w]*|claude|gemini|openai|anthropic|mistral|llama|agents?|agentic|mcp|copilot|cursor|windsurf|rag|embeddings?|prompts?|genai|generative|machine learning|vibe[- ]coding|v0|bolt\.new|lovable|webllm|webnn|transformers\.js|inference|chatbot|ai sdk)\b/i;
@@ -158,7 +165,7 @@ Below are ${items.length} candidate items collected from RSS feeds (portals, blo
 ${WEB_SEARCH ? `You also have a web_search tool. Use it (a few searches) to find important news from this week that the feeds missed: new AI models or APIs relevant to web devs, AI coding tools (Cursor, Claude Code, Copilot, v0, etc.), browser-side AI (WebGPU, WebNN, Chrome built-in AI), AI SDK/framework releases, notable articles.` : ''}
 
 Editorial rules:
-- Topic = the intersection of AI engineering and frontend/web development. Skip generic AI business news and generic frontend news with no AI angle, unless it is truly big.
+- Topic = the intersection of AI engineering and frontend/web development. Every item must be about using AI in frontend development. Skip generic AI news (models, funding, business) with no concrete frontend angle, and skip frontend news with no AI angle.
 - Pick the 12–20 most useful items. Prefer primary sources, releases, and substantive technical articles over hype and listicles. Merge duplicates about the same story.
 - Use ONLY URLs that appear in the candidate list or in your web search results. Never invent URLs.
 - For each item write a 1–2 sentence "why it matters" for a frontend dev, in plain English.

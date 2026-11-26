@@ -1,6 +1,6 @@
 # AI × Frontend Weekly — email digest on Vercel
 
-Every Monday it collects the week's news from about 23 feeds (Smashing, CSS-Tricks, JS Weekly, Frontend Focus, web.dev, Chrome devs, Vercel, dev.to, Hacker News, Reddit, Simon Willison, Latent Space, OpenAI, Hugging Face, GitHub releases of the AI SDK, MCP SDK and Transformers.js). It then has Claude **search the web** for anything the feeds missed, picks the best 12–20 items, writes a "why it matters" note for each one, and emails you the digest.
+Every Thursday it collects the week's AI-for-frontend news from about 27 feeds (Smashing, CSS-Tricks, Frontend Masters, JS Weekly, Frontend Focus, The New Stack, web.dev, Chrome devs, Vercel, Netlify, Builder.io, Addy Osmani, dev.to, Hacker News, Reddit, and GitHub releases of the AI SDK, Transformers.js, WebLLM, CopilotKit, assistant-ui, Chrome DevTools MCP and Playwright MCP). It then has Claude **search the web** for anything the feeds missed, picks the best 12–20 items, writes a "why it matters" note for each one, and emails you the digest.
 
 No framework and no npm dependencies: one function file, `api/digest.js`.
 
@@ -42,7 +42,7 @@ vercel.com → **Add New → Project** → pick the repo → Framework Preset: *
 
 Click **Deploy**. Vercel reads `vercel.json` and registers the weekly cron job automatically. You'll see it under **Project → Settings → Cron Jobs**.
 
-### 4. Test it right away (don't wait for Monday)
+### 4. Test it right away (don't wait for Thursday)
 - **Preview in the browser, no email sent:**
   `https://YOUR-PROJECT.vercel.app/api/digest?secret=YOUR_CRON_SECRET&preview=1`
 - **Send now:** open the same URL without `&preview=1`, or click **Run** next to the job in Settings → Cron Jobs.
@@ -51,7 +51,7 @@ Click **Deploy**. Vercel reads `vercel.json` and registers the weekly cron job a
 A run takes about 30–120 seconds because of the web searches, so the first load is slow.
 
 ## Customising
-- **Schedule:** change `"schedule"` in `vercel.json`. It uses UTC; `0 4 * * 1` is Monday 09:00 at UTC+5. On the Hobby plan, cron can run at most once a day and fires at some point within the scheduled hour.
+- **Schedule:** change `"schedule"` in `vercel.json`. It uses UTC; `0 4 * * 4` is Thursday 09:00 at UTC+5. On the Hobby plan, cron can run at most once a day and fires at some point within the scheduled hour.
 - **Sources:** edit the `SOURCES` array. `need: 'ai'` keeps only AI-related posts from a general frontend feed, `need: 'fe'` keeps only web-related posts from a general AI feed, and `need: null` keeps everything. Broken feeds are skipped automatically.
 - **Topic/tone:** edit the prompt in `buildPrompt()`.
 - **Env options:** `ANTHROPIC_MODEL`, `ENABLE_WEB_SEARCH=false` (cheaper, feeds only), `DAYS_BACK`, `EMAIL_FROM`.
